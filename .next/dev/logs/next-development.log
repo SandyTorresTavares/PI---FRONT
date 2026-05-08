@@ -1,0 +1,9 @@
+{"timestamp":"00:00:00.458","source":"Server","level":"WARN","message":"⚠ The \"middleware\" file convention is deprecated. Please use \"proxy\" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy"}
+{"timestamp":"00:00:00.524","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:03.097","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:00:21.888","source":"Browser","level":"LOG","message":"Register data: {\"email\":\"teste@email.com\",\"name\":\"Professor na gaita\",\"password\":\"123123\"}"}
+{"timestamp":"00:00:22.680","source":"Browser","level":"LOG","message":"Register data: {\"email\":\"teste@email.com\",\"name\":\"Professor na gaita\",\"password\":\"123123\"}"}
+{"timestamp":"00:00:23.698","source":"Browser","level":"LOG","message":"Register data: {\"email\":\"teste@email.com\",\"name\":\"Professor na gaita\",\"password\":\"123123\"}"}
+{"timestamp":"00:00:27.480","source":"Browser","level":"LOG","message":"Register data: {\"email\":\"teste@email.com\",\"name\":\"Professor na gaita\",\"password\":\"123123\"}"}
+{"timestamp":"00:00:30.381","source":"Browser","level":"LOG","message":"Register data: {\"email\":\"teste@email.com\",\"name\":\"Professor na gaita\",\"password\":\"123123\"}"}
+{"timestamp":"00:00:30.564","source":"Browser","level":"LOG","message":"Register data: {\"email\":\"teste@email.com\",\"name\":\"Professor na gaita\",\"password\":\"123123\"}"}
