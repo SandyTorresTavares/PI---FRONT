@@ -1,7 +1,14 @@
 node_modules
 .env
+.env.local
+.env.*.local
 .next
-node_modules
+out
 dist
 build
 .cache
+.turbo
+.vercel
+.DS_Store
+docs/
+*.log
