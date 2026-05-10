@@ -1,7 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Middleware logic here
+  const publicPaths = ['/', '/login', '/register'];
+  const { pathname } = request.nextUrl;
+
+  // Permitir acesso às rotas públicas
+  if (publicPaths.some((path) => pathname.startsWith(path))) {
+    return NextResponse.next();
+  }
+
+  // Verificar token no cookie
+  const token = request.cookies.get('token')?.value;
+  if (!token) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = '/login';
+    return NextResponse.redirect(loginUrl);
+  }
+
   return NextResponse.next();
 }
 

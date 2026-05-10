@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { register as registerUser } from '../../actions/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -36,10 +37,13 @@ export default function RegisterPage() {
     setIsLoading(true);
     setError('');
     try {
-      // TODO: Implementar chamada para API
       const { confirmPassword, ...submitData } = data;
-      console.log('Register data:', submitData);
-      // router.push('/login');
+      const response = await registerUser(submitData);
+      if (response.success) {
+        router.push('/login');
+      } else {
+        setError(response.message || 'Erro ao criar conta.');
+      }
     } catch (err) {
       setError('Erro ao criar conta. Tente novamente.');
     } finally {
