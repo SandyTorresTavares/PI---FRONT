@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getProfile } from '../../actions/auth';
 import { useRouter } from 'next/navigation';
 import TaskList from '../../components/TaskList';
 import TaskCreateModal from '../../components/TaskCreateModal';
@@ -17,7 +16,6 @@ import type { Task } from '../../types/task';
 export default function TasksPage() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [userName, setUserName] = useState<string | null>(null);
   const [token, setToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,17 +71,14 @@ export default function TasksPage() {
 
   useEffect(() => {
     const savedToken = localStorage.getItem('auth_token');
+
     if (!savedToken) {
       router.push('/login');
       return;
     }
+
     setToken(savedToken);
-    // Busca o nome do usuário
-    getProfile(savedToken).then((res) => {
-      if (res.success && res.data?.user) {
-        setUserName(res.data.user.name || res.data.user.email);
-      }
-    });
+
     loadTasks(savedToken).finally(() => {
       setIsLoading(false);
     });
@@ -222,12 +217,7 @@ export default function TasksPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-4">
-          <div>
-            {userName && (
-              <h2 className="text-2xl font-semibold text-indigo-700 mb-1">Olá, {userName}</h2>
-            )}
-            <h3 className="text-3xl font-bold text-gray-900">Minhas Tarefas</h3>
-          </div>
+          <h2 className="text-3xl font-bold text-gray-900">Minhas Tarefas</h2>
           {userRole && (
             <span className="text-sm text-gray-600">
               Perfil: <strong>{userRole}</strong>
