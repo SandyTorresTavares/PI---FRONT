@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { login } from '../../actions/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -31,9 +32,13 @@ export default function LoginPage() {
     setIsLoading(true);
     setError('');
     try {
-      // TODO: Implementar chamada para API
-      console.log('Login data:', data);
-      // router.push('/tasks');
+      const response = await login(data);
+      if (response.success && response.data?.token) {
+        localStorage.setItem('auth_token', response.data.token);
+        router.push('/tasks');
+      } else {
+        setError(response.message || 'Erro ao fazer login.');
+      }
     } catch (err) {
       setError('Erro ao fazer login. Tente novamente.');
     } finally {

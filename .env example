@@ -1,0 +1,3 @@
+// Server URL do backend (ajuste conforme necessário pelo arquivo PI---BACKEND/.env)
+
+NEXT_PUBLIC_API_URL=Sua_URL_do_backend_aqui
