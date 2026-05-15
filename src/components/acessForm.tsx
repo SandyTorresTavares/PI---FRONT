@@ -11,7 +11,7 @@ interface AcessFormProps {
   children?: React.ReactNode;
   buttonLabel?: string;
   error?: string;
-  title?: string;S
+  title?: string;
   subtitle?: string;
   isLogin?: boolean;
   footer?: React.ReactNode;
@@ -135,7 +135,6 @@ export default function AcessForm({
           ) : buttonLabel}
         </button>
       </form>
-      {/* Rodapé no mesmo estilo do LoginForm */}
       {footer !== undefined ? (
         <div className="mt-8 text-center text-xs text-gray-400">{footer}</div>
       ) : (
