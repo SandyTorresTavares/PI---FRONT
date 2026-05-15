@@ -1,3 +1,4 @@
+import { useRouter } from 'next/navigation';
 interface AcessFormProps {
   profile: 'estudante' | 'professor';
   setProfile: (profile: 'estudante' | 'professor') => void;
@@ -10,7 +11,7 @@ interface AcessFormProps {
   children?: React.ReactNode;
   buttonLabel?: string;
   error?: string;
-  title?: string;
+  title?: string;S
   subtitle?: string;
   isLogin?: boolean;
   footer?: React.ReactNode;
@@ -33,6 +34,7 @@ export default function AcessForm({
   isLogin = true,
   footer,
 }: AcessFormProps) {
+  const router = useRouter();
   return (
     <div className="w-full max-w-md mx-auto border border-gray-200 shadow-2xl rounded-2xl bg-white p-8">
       <div className="mb-8 text-center">
@@ -142,7 +144,13 @@ export default function AcessForm({
             <>
               <p className="text-center text-gray-600 mt-6">
                 Não tem conta?{' '}
-                <a href="/register" className="text-indigo-600 font-medium hover:text-indigo-700">Registre-se</a>
+                <button
+                  type="button"
+                  className="text-indigo-600 font-medium hover:text-indigo-700 underline bg-transparent border-none p-0 m-0 cursor-pointer"
+                  onClick={() => router.push('/register')}
+                >
+                  Registre-se
+                </button>
               </p>
               <p className="text-xs text-gray-400 text-center mt-4 mb-2">Desenvolvido com metodologia Design Thinking · UNIVESP</p>
             </>
