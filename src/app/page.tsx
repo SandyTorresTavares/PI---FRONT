@@ -1,55 +1,76 @@
 "use client";
+
+import { useState } from 'react';
+import { HiOutlineBookOpen } from 'react-icons/hi';
+import { HiOutlineClipboardDocumentList, HiOutlineChartBar, HiOutlineBellAlert } from 'react-icons/hi2';
+import FeatureCard from '../components/FeatureCard';
+import { login } from '../actions/auth';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import SideInfoPanel from '../components/SideInfoPanel';
+import AcessForm from '../components/acessForm';
+
+const loginSchema = z.object({
+  email: z.string().email('Email inválido'),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function Home() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [profile, setProfile] = useState<'estudante' | 'professor'>('estudante');
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const response = await login(data);
+      if (response.success && response.data?.token) {
+        localStorage.setItem('auth_token', response.data.token);
+        router.push('/tasks');
+      } else {
+        setError(response.message || 'Erro ao fazer login.');
+      }
+    } catch (err) {
+      setError('Erro ao fazer login. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-indigo-600">PI Tasks</h1>
-            <div className="space-x-4">
-              <Link
-                href="/login"
-                className="text-gray-600 hover:text-gray-900 font-medium"
-              >
-                Login
-              </Link>
-              <Link
-                href="/register"
-                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
-              >
-                Registrar
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Bem-vindo ao PI Tasks
-          </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Organize suas tarefas de forma eficiente e produtiva. Faça login ou crie uma conta para começar.
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Link
-              href="/login"
-              className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 font-medium text-lg"
-            >
-              Fazer Login
-            </Link>
-            <Link
-              href="/register"
-              className="bg-white text-indigo-600 px-8 py-3 rounded-lg border-2 border-indigo-600 hover:bg-indigo-50 font-medium text-lg"
-            >
-              Criar Conta
-            </Link>
-          </div>
-        </div>
+    <main className="min-h-screen w-full flex bg-blue-700">
+      <SideInfoPanel />
+      <div className="flex flex-col justify-center w-full md:w-1/2 bg-white p-6 sm:p-8 md:p-16 min-w-[320px] min-h-screen rounded-l-3xl">
+        <AcessForm
+          profile={profile}
+          setProfile={setProfile}
+          showProfileSelector={false}
+          isLoading={isLoading}
+          register={register}
+          errors={errors}
+          onSubmit={onSubmit}
+          handleSubmit={handleSubmit}
+          buttonLabel={isLoading ? 'Entrando...' : 'Entrar'}
+          error={error}
+          title="Bem-vindo de volta"
+          subtitle="Acesse sua conta para continuar"
+          isLogin={true}
+        />
       </div>
     </main>
   );

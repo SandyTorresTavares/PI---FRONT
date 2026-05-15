@@ -73,7 +73,7 @@ export default function TasksPage() {
     const savedToken = localStorage.getItem('auth_token');
 
     if (!savedToken) {
-      router.push('/login');
+      router.push('/');
       return;
     }
 
@@ -86,7 +86,7 @@ export default function TasksPage() {
 
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
-    router.push('/login');
+    router.push('/');
   };
 
   const handleCreateTask = async () => {
