@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Task } from '../types/task';
 import TaskItem from './TaskItem';
 
@@ -18,7 +17,13 @@ interface TaskListProps {
   onToggleStatus: (task: Task, checked: boolean) => void;
 }
 
-const TaskList: React.FC<TaskListProps> = ({
+
+interface TaskListPropsWithMsg extends TaskListProps {
+  showStatusMsg?: (msg: string) => void;
+  statusMsg?: string | null;
+}
+
+const TaskList: React.FC<TaskListPropsWithMsg> = ({
   tasks,
   userRole,
   editingTaskId,
@@ -32,28 +37,40 @@ const TaskList: React.FC<TaskListProps> = ({
   onSaveEdit,
   onDelete,
   onToggleStatus,
+  showStatusMsg,
+  statusMsg,
 }) => {
   return (
-    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-      {tasks.map((task) => (
-        <TaskItem
-          key={task.id}
-          task={task}
-          userRole={userRole}
-          isEditing={editingTaskId === task.id}
-          editingTitle={editingTitle}
-          editingDescription={editingDescription}
-          isSubmitting={isSubmitting}
-          onEdit={onEdit}
-          onCancelEdit={onCancelEdit}
-          onChangeEditTitle={onChangeEditTitle}
-          onChangeEditDescription={onChangeEditDescription}
-          onSaveEdit={onSaveEdit}
-          onDelete={onDelete}
-          onToggleStatus={onToggleStatus}
-        />
-      ))}
-    </div>
+    <>
+      {statusMsg && (
+        <div style={{ position: 'fixed', left: 24, bottom: 24, zIndex: 9999, pointerEvents: 'none' }}>
+          <div className="bg-blue-600 text-white px-5 py-3 rounded-xl shadow-lg text-base animate-fade-in-out pointer-events-auto">
+            {statusMsg}
+          </div>
+        </div>
+      )}
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {tasks.map((task) => (
+          <TaskItem
+            key={task.id}
+            task={task}
+            userRole={userRole}
+            isEditing={editingTaskId === task.id}
+            editingTitle={editingTitle}
+            editingDescription={editingDescription}
+            isSubmitting={isSubmitting}
+            onEdit={onEdit}
+            onCancelEdit={onCancelEdit}
+            onChangeEditTitle={onChangeEditTitle}
+            onChangeEditDescription={onChangeEditDescription}
+            onSaveEdit={onSaveEdit}
+            onDelete={onDelete}
+            onToggleStatus={onToggleStatus}
+            showStatusMsg={showStatusMsg}
+          />
+        ))}
+      </div>
+    </>
   );
 };
 

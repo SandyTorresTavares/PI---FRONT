@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TaskList from '../../components/TaskList';
 import TaskCreateModal from '../../components/TaskCreateModal';
+import TaskDashboard from '../../components/TaskDashboard';
 import {
   createTask,
   deleteTask,
@@ -11,7 +12,11 @@ import {
   updateTask,
   updateTaskStatus,
 } from '../../actions/task';
+import { getProfile } from '../../actions/auth';
 import type { Task } from '../../types/task';
+import type { UserProfile } from '../../types/auth';
+import { HiOutlineBookOpen } from 'react-icons/hi';
+import React, { useRef } from 'react';
 
 export default function TasksPage() {
   const router = useRouter();
@@ -28,6 +33,14 @@ export default function TasksPage() {
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
   const [editingDescription, setEditingDescription] = useState('');
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  const statusMsgTimeout = useRef<NodeJS.Timeout | null>(null);
+  const showStatusMsg = (msg: string) => {
+    setStatusMsg(msg);
+    if (statusMsgTimeout.current) clearTimeout(statusMsgTimeout.current);
+    statusMsgTimeout.current = setTimeout(() => setStatusMsg(null), 3000);
+  };
 
   const userRole = useMemo(() => {
     if (!token) return null;
@@ -73,12 +86,17 @@ export default function TasksPage() {
     const savedToken = localStorage.getItem('auth_token');
 
     if (!savedToken) {
-      router.push('/login');
+      router.push('/');
       return;
     }
 
     setToken(savedToken);
-
+    // Buscar perfil do usuário
+    getProfile(savedToken).then((res) => {
+      if (res.success && res.data?.user) {
+        setUser(res.data.user);
+      }
+    });
     loadTasks(savedToken).finally(() => {
       setIsLoading(false);
     });
@@ -86,7 +104,7 @@ export default function TasksPage() {
 
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
-    router.push('/login');
+    router.push('/');
   };
 
   const handleCreateTask = async () => {
@@ -188,42 +206,82 @@ export default function TasksPage() {
     if (!response.success) {
       setError(response.message || 'Não foi possível atualizar o status da tarefa.');
       setIsSubmitting(false);
+      showStatusMsg(response.message || 'Não foi possível atualizar o status da tarefa.');
       return;
     }
 
     setSuccessMessage(response.message || 'Status da tarefa atualizado.');
+    showStatusMsg(response.message || 'Status da tarefa atualizado.');
     await loadTasks(token);
     setIsSubmitting(false);
   };
 
+  // Cálculo dos totais para o dashboard
+  const totalTasks = tasks.length;
+  const doneTasks = tasks.filter(t => t.completed).length;
+  const pendingTasks = tasks.filter(t => !t.completed).length;
+
   return (
     <main className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
+      <nav className="bg-white shadow relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-indigo-600">PI Tasks</h1>
+            <div className="flex items-center gap-2">
+              <span className="text-3xl" style={{ color: '#2563eb' }}>
+                <HiOutlineBookOpen />
+              </span>
+              <h1 className="text-2xl font-bold" style={{ color: '#2563eb' }}>
+                Projeto Integrador
+              </h1>
+            </div>
             <div className="space-x-4">
               <button
                 type="button"
                 onClick={handleLogout}
-                className="text-gray-600 hover:text-gray-900 font-medium"
+                className="text-gray-600 hover:text-gray-900 font-medium transition-colors duration-150 cursor-pointer"
               >
                 Sair
               </button>
             </div>
           </div>
         </div>
+        {/* Detalhe azul no topo */}
+        <div className="absolute left-0 right-0 h-1 bg-blue-600 top-0 rounded-t-xl" style={{ opacity: 0.15 }} />
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-3xl font-bold text-gray-900">Minhas Tarefas</h2>
           {userRole && (
-            <span className="text-sm text-gray-600">
+            <span className="text-sm font-semibold" style={{ color: '#2563eb' }}>
               Perfil: <strong>{userRole}</strong>
             </span>
           )}
         </div>
+        {/* Saudação para todos os perfis */}
+        {user && (
+          <div className="text-xl font-semibold text-gray-800 mb-6">Olá, {user.name || user.email}!</div>
+        )}
+        {/* Dashboard e barra de progresso só para aluno */}
+        {userRole === 'aluno' && (
+          <>
+            <TaskDashboard total={totalTasks} done={doneTasks} pending={pendingTasks} />
+            {totalTasks > 0 && (
+              <div className="w-full mb-8">
+                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                  <span>Progresso</span>
+                  <span>{Math.round((doneTasks / totalTasks) * 100)}%</span>
+                </div>
+                <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-indigo-500 transition-all duration-300"
+                    style={{ width: `${(doneTasks / totalTasks) * 100}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
         {userRole === 'aluno' && (
           <div className="mb-6 flex gap-2">
@@ -263,15 +321,10 @@ export default function TasksPage() {
           </div>
         )}
 
+
         {error && (
           <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
             {error}
-          </div>
-        )}
-
-        {successMessage && (
-          <div className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700">
-            {successMessage}
           </div>
         )}
 
@@ -281,7 +334,7 @@ export default function TasksPage() {
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(true)}
-                className="rounded-lg bg-indigo-600 px-6 py-2 font-medium text-white transition hover:bg-indigo-700"
+                className="rounded-lg bg-indigo-600 px-6 py-2 font-medium text-white transition hover:bg-indigo-700 cursor-pointer"
               >
                 + Nova Tarefa
               </button>
@@ -326,9 +379,17 @@ export default function TasksPage() {
             onSaveEdit={handleUpdateTask}
             onDelete={handleDeleteTask}
             onToggleStatus={handleToggleTaskStatus}
+            showStatusMsg={showStatusMsg}
+            statusMsg={statusMsg}
           />
         )}
       </div>
+      <footer className="w-full mt-16 py-6 bg-gradient-to-r from-blue-50 via-white to-blue-50 border-t border-blue-100">
+        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-gray-500">
+          Projeto Integrador UNIVESP &copy; {new Date().getFullYear()}<br />
+          Sistema acadêmico desenvolvido para fins educacionais — Universidade Virtual do Estado de São Paulo
+        </div>
+      </footer>
     </main>
   );
 }
