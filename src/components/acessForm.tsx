@@ -1,4 +1,3 @@
-
 interface AcessFormProps {
   profile: 'estudante' | 'professor';
   setProfile: (profile: 'estudante' | 'professor') => void;

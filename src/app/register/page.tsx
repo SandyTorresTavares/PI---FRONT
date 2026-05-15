@@ -4,7 +4,6 @@ import { useState } from 'react';
 import SideInfoPanel from '../../components/SideInfoPanel';
 import AuthForm from '../../components/acessForm';
 import { register as registerUser } from '../../actions/auth';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

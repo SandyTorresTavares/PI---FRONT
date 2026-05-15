@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { HiOutlineBookOpen } from 'react-icons/hi';
-import { HiOutlineClipboardDocumentList, HiOutlineChartBar, HiOutlineBellAlert } from 'react-icons/hi2';
-import FeatureCard from '../components/FeatureCard';
 import { login } from '../actions/auth';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
