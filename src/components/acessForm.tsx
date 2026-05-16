@@ -157,7 +157,13 @@ export default function AcessForm({
             <>
               <p className="text-center text-gray-600 mt-6">
                 Já tem conta?{' '}
-                <a href="/" className="text-indigo-600 font-medium hover:text-indigo-700">Faça login</a>
+                <button
+                  type="button"
+                  className="text-indigo-600 font-medium hover:text-indigo-700 underline bg-transparent border-none p-0 m-0 cursor-pointer"
+                  onClick={() => router.push('/')}
+                >
+                  Faça login
+                </button>
               </p>
               <p className="text-xs text-gray-400 text-center mt-4 mb-2">Desenvolvido com metodologia Design Thinking · UNIVESP</p>
             </>
